@@ -1,0 +1,72 @@
+// ----- BEGIN: Ghostfolio Savings & Tax models (prefix gf_) -----
+model gf_SavingsAccount {
+  id               String   @id @default(cuid())
+  userId           String
+  name             String
+  kind             gf_SavingsKind
+  annualRateBps    Int?
+  baseIndex        gf_BaseIndex?
+  marginBps        Int?
+  compounding      gf_Compounding
+  currency         String   @default("USD")
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  transactions     gf_SavingsTx[]
+  recurringRules   gf_RecurringDeposit[]
+  @@index([userId, isActive])
+}
+enum gf_SavingsKind { FIXED VARIABLE PRIME_PLUS_MINUS }
+enum gf_BaseIndex { P CPI EURIBOR SOFR }
+enum gf_Compounding { NONE MONTHLY YEARLY }
+model gf_SavingsTx {
+  id          String        @id @default(cuid())
+  accountId   String
+  date        DateTime
+  kind        gf_SavingsTxKind
+  amount      Decimal
+  note        String?
+  createdAt   DateTime @default(now())
+  account     gf_SavingsAccount @relation(fields: [accountId], references: [id])
+  @@index([accountId, date])
+}
+enum gf_SavingsTxKind { DEPOSIT WITHDRAWAL INTEREST ADJUSTMENT }
+model gf_RecurringDeposit {
+  id          String   @id @default(cuid())
+  accountId   String
+  amount      Decimal
+  frequency   gf_Frequency
+  dayOfMonth  Int?
+  weekday     Int?
+  startDate   DateTime
+  endDate     DateTime?
+  nextRunAt   DateTime
+  isActive    Boolean  @default(true)
+  account     gf_SavingsAccount @relation(fields: [accountId], references: [id])
+  @@index([accountId, isActive])
+}
+enum gf_Frequency { WEEKLY MONTHLY QUARTERLY }
+model gf_TaxSettings {
+  id              String  @id @default(cuid())
+  userId          String  @unique
+  country         String  @default("IL")
+  rateBps         Int     @default(2500)
+  includeFees     Boolean @default(true)
+  treatDividends  Boolean @default(true)
+  lotMethod       gf_LotMethod @default(FIFO)
+  updatedAt       DateTime @updatedAt
+}
+enum gf_LotMethod { FIFO SPECIFIC_ID }
+model gf_TaxLot {
+  id           String   @id @default(cuid())
+  userId       String
+  symbol       String
+  quantity     Decimal
+  costBasis    Decimal
+  acquiredAt   DateTime
+  lotRef       String?
+  isClosed     Boolean  @default(false)
+  closedAt     DateTime?
+  @@index([userId, symbol, isClosed])
+}
+// ----- END: Ghostfolio Savings & Tax models -----

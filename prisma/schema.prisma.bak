@@ -1,4 +1,4 @@
-generator client {
+﻿generator client {
   provider        = "prisma-client-js"
   previewFeatures = []
   binaryTargets   = ["debian-openssl-3.0.x", "linux-arm64-openssl-3.0.x", "native"]
@@ -343,7 +343,6 @@ enum ViewMode {
   DEFAULT
   ZEN
 }
-
 // ----- BEGIN: Ghostfolio Savings & Tax models (prefix gf_) -----
 
 // ----- END: Ghostfolio Savings & Tax models -----
@@ -353,6 +352,8 @@ enum ViewMode {
 // ----- BEGIN: Ghostfolio Savings & Tax models (prefix gf_) -----
 
 // ----- END: Ghostfolio Savings & Tax models -----
+
+
 
 // === gf: savings & tax (END) ===
 
@@ -395,17 +396,17 @@ enum gf_LotMethod {
 }
 
 model gf_SavingsAccount {
-  id             String                @id @default(cuid())
-  userId         String
+  id             String              @id @default(cuid())
+  userId         String              @index
   name           String
   kind           gf_SavingsKind
   annualRateBps  Int?
   baseIndex      gf_BaseIndex?
   marginBps      Int?
-  compounding    gf_Compounding        @default(MONTHLY)
-  currency       String?               @default("ILS")
-  isActive       Boolean               @default(true)
-  createdAt      DateTime              @default(now())
+  compounding    gf_Compounding      @default(MONTHLY)
+  currency       String?             @default("ILS")
+  isActive       Boolean             @default(true)
+  createdAt      DateTime            @default(now())
   tx             gf_SavingsTx[]
   recurringRules gf_RecurringDeposit[]
 }
@@ -435,7 +436,7 @@ model gf_RecurringDeposit {
   nextRunAt  DateTime
   isActive   Boolean      @default(true)
 
-  account gf_SavingsAccount @relation(fields: [accountId], references: [id])
+  account    gf_SavingsAccount @relation(fields: [accountId], references: [id])
 
   @@index([accountId, isActive])
 }
@@ -452,17 +453,18 @@ model gf_TaxSettings {
 }
 
 model gf_TaxLot {
-  id         String    @id @default(cuid())
+  id         String   @id @default(cuid())
   userId     String
   symbol     String
-  quantity   Decimal   @db.Decimal(18, 4)
-  costBasis  Decimal   @db.Decimal(18, 4)
+  quantity   Decimal  @db.Decimal(18, 4)
+  costBasis  Decimal  @db.Decimal(18, 4)
   acquiredAt DateTime
   lotRef     String?
-  isClosed   Boolean   @default(false)
+  isClosed   Boolean  @default(false)
   closedAt   DateTime?
 
   @@index([userId, symbol, isClosed])
 }
-
 // === gf: savings & tax (END) ===
+
+

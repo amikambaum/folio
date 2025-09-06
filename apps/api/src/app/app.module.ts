@@ -54,6 +54,7 @@ import { RedisCacheModule } from './redis-cache/redis-cache.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { SymbolModule } from './symbol/symbol.module';
 import { UserModule } from './user/user.module';
+import { SavingsModule } from './savings/savings.module';
 
 @Module({
   controllers: [AppController],
@@ -102,6 +103,7 @@ import { UserModule } from './user/user.module';
     PublicModule,
     RedisCacheModule,
     ScheduleModule.forRoot(),
+	SavingsModule,
     ServeStaticModule.forRoot({
       exclude: ['/.well-known/*wildcard', '/api/*wildcard', '/sitemap.xml'],
       rootPath: join(__dirname, '..', 'client'),
